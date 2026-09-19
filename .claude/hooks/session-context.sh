@@ -16,7 +16,7 @@ if git rev-parse --git-dir >/dev/null 2>&1; then
   if [[ -z "${CLAUDE_ROLE:-}" && "$(git branch --show-current 2>/dev/null)" == sprint/* ]]; then
     echo "WARNING: no role set on a sprint branch."
     echo "If you meant to implement or audit, exit and relaunch with"
-    echo ".claude/bin/implement.sh or .claude/bin/audit.sh."
+    echo ".claude/bin/builder.sh or .claude/bin/auditor.sh."
   fi
   if git rev-parse HEAD >/dev/null 2>&1; then
     echo

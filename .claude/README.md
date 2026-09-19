@@ -137,7 +137,7 @@ A script answers with its exit code: `0` means "go ahead"; `2` means
 
 ### `hooks/stop-tests.sh`
 
-- **What it does:** the implementer cannot finish while
+- **What it does:** the builder cannot finish while
   `make test-short` fails.
 - **Why:** it turns "the tests must pass" from a request into an obligation.
 - **Worth it?** Yes, essential. It is the Definition of Done, enforced.
@@ -158,7 +158,7 @@ A script answers with its exit code: `0` means "go ahead"; `2` means
   It re-runs the verification, checks that each test really tests what it
   claims, runs `go-reviewer`, and appends the verdict to the sprint report
   using section 2 of `docs/templates/sprint-report.md`.
-- **Why:** it does not trust what the implementer says; it checks it.
+- **Why:** it does not trust what the builder says; it checks it.
 - **Worth it?** Yes, if you work in sprints. It is half of the process.
 
 ---
@@ -196,16 +196,16 @@ A script answers with its exit code: `0` means "go ahead"; `2` means
 - **Worth it?** Yes, although it is the least critical hook: if it fails,
   Claude still works, it just finds its way less easily.
 
-### `roles/implementer.json` and `roles/auditor.json`
+### `roles/builder.json` and `roles/auditor.json`
 
-- **What they do:** the permissions of each role. The implementer can build
+- **What they do:** the permissions of each role. The builder can build
   and test without asking; the auditor can only read, verify and write its
   verdict.
 - **Why:** the auditor cannot touch the code, even if it tried.
 - **Worth it?** Yes, if you use two terminals. With a single terminal they
   are not needed.
 
-### `bin/implement.sh` and `bin/audit.sh`
+### `bin/builder.sh` and `bin/auditor.sh`
 
 - **What they do:** start Claude with the right role, permissions and mode,
   so you do not have to remember any of it.
@@ -216,8 +216,8 @@ A script answers with its exit code: `0` means "go ahead"; `2` means
 
 How to use them, from the project root:
 
-| Terminal        | Start                                         | Then run           |
-| --------------- | --------------------------------------------- | ------------------ |
-| 1 — implementer | `.claude/bin/implement.sh`                    | `/start-sprint NN` |
-| 2 — auditor     | `.claude/bin/audit.sh` (on the sprint branch) | `/audit-sprint NN` |
+| Terminal    | Start                                           | Then run           |
+| ----------- | ----------------------------------------------- | ------------------ |
+| 1 — builder | `.claude/bin/builder.sh`                        | `/start-sprint NN` |
+| 2 — auditor | `.claude/bin/auditor.sh` (on the sprint branch) | `/audit-sprint NN` |
 

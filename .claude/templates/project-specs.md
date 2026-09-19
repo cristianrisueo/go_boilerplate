@@ -32,7 +32,7 @@ Go module: `github.com/<owner>/<project>`
 
 ### Out of scope
 
-<!-- What will NOT be built, even if it seems natural. The implementer uses
+<!-- What will NOT be built, even if it seems natural. The builder uses
      this list to avoid widening the scope; the auditor uses it for A8. -->
 
 ## 3. Assumptions and known limitations

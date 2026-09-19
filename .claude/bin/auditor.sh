@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Starts a Claude Code session with the auditor role.
-# Usage: .claude/bin/audit.sh   then run /audit-sprint NN
+# Usage: .claude/bin/auditor.sh   then run /audit-sprint NN
 set -euo pipefail
 
 root="$(git rev-parse --show-toplevel)"

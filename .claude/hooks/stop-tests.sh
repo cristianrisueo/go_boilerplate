@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Stop hook.
-# The implementer cannot end its turn while `make test-short` fails.
+# The builder cannot end its turn while `make test-short` fails.
 # Exit 2 = Claude keeps working and receives the failing output.
 
 set -uo pipefail
 
-[[ "${CLAUDE_ROLE:-}" == "implementer" ]] || exit 0
+[[ "${CLAUDE_ROLE:-}" == "builder" ]] || exit 0
 
 input="$(cat)"
 # Already continuing because of this hook: let it stop to avoid an endless loop.

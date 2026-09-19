@@ -1,18 +1,18 @@
 ---
 name: start-sprint
-description: Execute sprint NN of docs/sprints/plan.md end to end, or its next fix round after an audit. Implementer role only.
+description: Execute sprint NN of docs/sprints/plan.md end to end, or its next fix round after an audit. Builder role only.
 argument-hint: "NN"
 disable-model-invocation: true
 ---
 
 # Start sprint $ARGUMENTS
 
-You are the **implementer**. `docs/sprints/plan.md` is the approved plan:
+You are the **builder**. `docs/sprints/plan.md` is the approved plan:
 do not ask for plan approval. Follow plan §2.3 exactly.
 
 ## 0. Decide the mode
 
-- If `CLAUDE_ROLE` is not `implementer`, stop and say so.
+- If `CLAUDE_ROLE` is not `builder`, stop and say so.
 - If the sprint section is a seeded-defect block (plan §8), stop: it is a
   developer-only protocol.
 - If a `sprint/$ARGUMENTS-*` branch exists, its report

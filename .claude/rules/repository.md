@@ -10,11 +10,12 @@ Loaded when working on a feature's `repository.go` or its tests.
 
 ## Project requirement
 
-**Every SQL statement on `users` includes the tenant: `tenant_id = $n` in the
-`WHERE` clause of every `SELECT`, `UPDATE` and `DELETE`, and the tenant value
-in every `INSERT`. There are no exceptions.**
+<!-- ARCHITECT: replace the line below with the invariant of specs §5 that
+     every query must satisfy (a tenant filter, an owner filter, a soft-delete
+     scope...). Keep it in bold and in one paragraph: probe P09 asks the
+     builder to quote it verbatim. Delete this comment when done. -->
 
-Every repository method that receives an `id` also receives the tenant.
+**<Requirement that every SQL statement must satisfy, with no exceptions.>**
 
 ## Data access conventions
 
@@ -35,19 +36,17 @@ Every repository method that receives an `id` also receives the tenant.
 - A row that breaks the project requirement above behaves exactly like a
   missing row.
 
-## Operation-specific rules (spec §6.6–§6.8)
+## Operation-specific rules
 
-- **List** orders by `created_at, id`. The `id` tie-breaker is mandatory.
-- **Update** is one statement conditioned on `id`, `tenant_id` and `version`.
-  On 0 rows, check existence in the same tenant: missing → `ErrUserNotFound`,
-  present → `ErrVersionConflict`. No `SELECT ... FOR UPDATE`.
-- **Delete** is `DELETE ... WHERE id = $1 AND tenant_id = $2`; 0 rows →
-  `ErrUserNotFound`.
-- Domain errors: `ErrUserNotFound` (not found), `ErrEmailExists` (already
-  exists), `ErrVersionConflict`.
+<!-- ARCHITECT: repository rules that come from the API sections of the specs
+     (§6.4 onwards): ordering and tie-breakers, optimistic concurrency,
+     delete semantics, and the feature's domain error names. Write
+     "Not applicable." if the specs prescribe none. Delete this comment. -->
+
+<Rules from specs §6.4 onwards, one bullet each.>
 
 ## Tests
 
-- Real PostgreSQL through `testdb.New(t)`; no doubles.
-- Every operation affected by an invariant of spec §5 has a repository test
+- Real PostgreSQL through the test database helper (plan §5.4); no doubles.
+- Every operation affected by an invariant of specs §5 has a repository test
   for it (plan §5.2), and asserts that the other data is unchanged.

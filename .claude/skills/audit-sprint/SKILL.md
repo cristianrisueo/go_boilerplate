@@ -16,12 +16,12 @@ or tests and never fix anything: you find, classify and report.
 - `CLAUDE_ROLE` is `auditor` and the current branch is `sprint/$ARGUMENTS-*`.
 - `docs/sprints/reports/sprint-$ARGUMENTS.md` exists.
 - The working tree is clean, except the report itself when it is untracked
-  (seeded-defect audit). Anything else means the implementer may still be
+  (seeded-defect audit). Anything else means the builder may still be
   working: stop and say so.
 - Round `N` = number of `## Audit — round` sections in the report, plus 1.
 
 **Seeded-defect mode.** If the report says "Seeded-defect audit", there is
-no implementer report to check. In this mode, A1 uses the standard command
+no builder report to check. In this mode, A1 uses the standard command
 below, A9 and A10 are `N/A`, and A8 is judged against the spec only.
 
 ## 1. Read

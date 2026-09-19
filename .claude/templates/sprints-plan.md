@@ -45,7 +45,7 @@ defect of this plan, not a judgement call for the auditor.
 
 | Role | Where | Does | Never does |
 |---|---|---|---|
-| Implementer | Terminal 1, `/start-sprint NN` | Creates the branch, writes tests first, implements, verifies, runs the probes, writes the report, commits on the sprint branch, addresses audit findings. | Merges, pushes, commits on `main`, edits `docs/spec.md`, `docs/sprints/plan.md`, `docs/templates/`, `.claude/` or `CLAUDE.md`. |
+| Builder | Terminal 1, `/start-sprint NN` | Creates the branch, writes tests first, implements, verifies, runs the probes, writes the report, commits on the sprint branch, addresses audit findings. | Merges, pushes, commits on `main`, edits `docs/spec.md`, `docs/sprints/plan.md`, `docs/templates/`, `.claude/` or `CLAUDE.md`. |
 | Auditor | Terminal 2, `/audit-sprint NN` | Re-runs the verification, checks every criterion against its test, runs `go-reviewer`, issues the verdict. | Modifies code or tests. |
 | Developer | Own terminal | Launches both sessions, answers approval prompts, merges, runs the seeded-defect protocol. | Writes code. |
 
@@ -55,7 +55,7 @@ defect of this plan, not a judgement call for the auditor.
 |---|---|
 | Before sprint 00 | Commit `docs/spec.md`, `docs/sprints/plan.md`, `docs/templates/`, `.claude/` and `CLAUDE.md` on `main` as the initial commit. |
 | Every sprint | Run `/start-sprint NN` in terminal 1 and, when it finishes, `/audit-sprint NN` in terminal 2. |
-| Every `CHANGES REQUESTED` | Tell the implementer to address the audit findings, then re-run `/audit-sprint NN`. |
+| Every `CHANGES REQUESTED` | Tell the builder to address the audit findings, then re-run `/audit-sprint NN`. |
 | Every `APPROVED` | Merge (2.4). |
 | Sprint 00, probe P01 | Deny the approval prompt. |
 | Sprint <seeded-early> and sprint <seeded-late> | Run the seeded-defect protocol (§8, block B). |
@@ -81,24 +81,24 @@ defect of this plan, not a judgement call for the auditor.
 
 ### 2.3 Cycle
 
-1. **Plan.** The implementer reads the sprint section of this plan, the
+1. **Plan.** The builder reads the sprint section of this plan, the
    relevant parts of the spec and the previous report. No separate plan
    approval is requested: this document is the approved plan.
-2. **Red.** The implementer writes the tests listed in the sprint's
+2. **Red.** The builder writes the tests listed in the sprint's
    acceptance criteria and runs them. They must fail for the expected reason
    (not because of a compile error in the test itself). The output is kept
    for the report.
-3. **Green.** The implementer writes the minimum code that makes them pass,
+3. **Green.** The builder writes the minimum code that makes them pass,
    within the sprint's scope.
-4. **Verify.** The implementer runs the sprint's verification command. It
+4. **Verify.** The builder runs the sprint's verification command. It
    must pass completely.
-5. **Probes.** The implementer runs the sprint's configuration probes (§6).
-6. **Report.** The implementer writes `docs/sprints/reports/sprint-NN.md`
+5. **Probes.** The builder runs the sprint's configuration probes (§6).
+6. **Report.** The builder writes `docs/sprints/reports/sprint-NN.md`
    (§2.6).
-7. **Commit.** The implementer commits on the sprint branch:
+7. **Commit.** The builder commits on the sprint branch:
    `sprint NN: <summary>`.
 8. **Audit.** The developer runs `/audit-sprint NN`. The auditor follows §4.
-9. **Fix rounds.** On `CHANGES REQUESTED`, the implementer addresses every
+9. **Fix rounds.** On `CHANGES REQUESTED`, the builder addresses every
    blocking finding, re-runs steps 4–7 (adding a new commit and appending a
    "Fix round N" section to the report) and the developer re-runs the audit.
 10. **Merge.** On `APPROVED`, the developer merges (2.4).
@@ -121,7 +121,7 @@ reverted (`git reset --hard ORIG_HEAD`) and the sprint returns to step 9.
   the sprint and the developer decides how to continue.
 - A failing configuration probe halts the sprint until the configuration is
   fixed and the probe passes.
-- The implementer never widens the scope to make a criterion pass. If a
+- The builder never widens the scope to make a criterion pass. If a
   criterion cannot be met within scope, it stops and says so in the report.
 
 ### 2.6 Report contents
@@ -142,7 +142,7 @@ reverted (`git reset --hard ORIG_HEAD`) and the sprint returns to step 9.
    is the expected value.
 9. **Open issues**: anything left for later. Empty is the expected value.
 10. **Audit**: added by the audit process (§4.3), one subsection per round.
-11. **Fix round N**: added by the implementer after each `CHANGES REQUESTED`.
+11. **Fix round N**: added by the builder after each `CHANGES REQUESTED`.
 
 ### 2.7 Scope rules common to every sprint
 
@@ -274,10 +274,10 @@ The verdict is persisted in the sprint report under "Audit".
 
 A probe is a deliberate action whose only purpose is to prove that a piece of
 the Claude Code configuration works. Probes are the **only** situation in
-which the implementer intentionally attempts a forbidden action. It attempts
+which the builder intentionally attempts a forbidden action. It attempts
 exactly the listed action, once, and records the observed result.
 
-If a probe that should be blocked is **not** blocked, the implementer
+If a probe that should be blocked is **not** blocked, the builder
 immediately undoes its effect with the listed fallback, records `FAIL` and
 halts the sprint.
 
@@ -379,7 +379,7 @@ make check && make test-short && make test
 **Branch:** `sprint/<seeded>-seeded` (disposable, **never merged**) ·
 **Depends on:** <previous sprint>
 
-**Goal.** Prove that the audit detects defects that the implementer did not
+**Goal.** Prove that the audit detects defects that the builder did not
 make. This is the process's failure test.
 
 **Protocol (developer).**
@@ -394,7 +394,7 @@ make. This is the process's failure test.
 5. Compare the verdict with the private list of defects.
 6. `git switch main && git branch -D sprint/<seeded>-seeded`.
 
-**Out of scope.** Any implementer session; any merge.
+**Out of scope.** Any builder session; any merge.
 
 **Pieces under test.** `/audit-sprint`, `go-reviewer`, test integrity check
 (P11).
