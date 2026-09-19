@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(go build *)",
+      "Bash(go test *)",
+      "Bash(go vet *)",
+      "Bash(go tool cover *)",
+      "Bash(go version)",
+      "Bash(gofmt -l *)",
+      "Bash(make check)",
+      "Bash(make test-short)",
+      "Bash(make test)",
+      "Bash(make up)",
+      "Bash(make -n *)",
+      "Bash(docker compose *)",
+      "Bash(docker inspect *)",
+      "Bash(curl *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git branch *)",
+      "Bash(git add docs/sprints/reports/*)",
+      "Bash(git commit *)",
+      "Edit(docs/sprints/reports/**)",
+      "Agent(go-reviewer)",
+      "Bash(grep *)",
+      "Bash(printenv CLAUDE_ROLE)",
+      "Edit(docs/sprints/debt.md)",
+      "Bash(git add docs/sprints/debt.md)"
+    ],
+    "deny": ["Edit(.claude/**)", "Edit(CLAUDE.md)"]
+  }
+}

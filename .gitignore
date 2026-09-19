@@ -1,0 +1,11 @@
+# Claude Code: personal files, never shared (see .claude/README.md)
+.claude/settings.local.json
+CLAUDE.local.md
+
+# Go: coverage profile, test binaries and the binary built at the root
+cover.out
+*.test
+/api
+
+# macOS
+.DS_Store
