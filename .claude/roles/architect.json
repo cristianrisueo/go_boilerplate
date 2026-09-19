@@ -9,29 +9,37 @@
       "Bash(find *)",
       "Bash(ls *)",
       "Bash(wc *)",
+      "Bash(mkdir -p docs/*)",
       "Bash(git status *)",
       "Bash(git diff *)",
       "Bash(git log *)",
       "Bash(git branch *)",
-      "Bash(git add docs/*)",
-      "Bash(git add CLAUDE.md)",
-      "Bash(git add .claude/rules/*)",
-      "Bash(git commit *)",
       "Bash(printenv CLAUDE_ROLE)",
       "Edit(docs/**)",
+      "Write(docs/**)",
       "Edit(CLAUDE.md)",
+      "Write(CLAUDE.md)",
       "Edit(.claude/rules/**)",
+      "Write(.claude/rules/**)",
       "Agent(Explore)"
     ],
     "deny": [
       "Edit(.claude/settings.json)",
+      "Write(.claude/settings.json)",
       "Edit(.claude/settings.local.json)",
+      "Write(.claude/settings.local.json)",
       "Edit(.claude/roles/**)",
+      "Write(.claude/roles/**)",
       "Edit(.claude/hooks/**)",
+      "Write(.claude/hooks/**)",
       "Edit(.claude/bin/**)",
+      "Write(.claude/bin/**)",
       "Edit(.claude/skills/**)",
+      "Write(.claude/skills/**)",
       "Edit(.claude/agents/**)",
-      "Edit(.claude/templates/**)"
+      "Write(.claude/agents/**)",
+      "Edit(.claude/templates/**)",
+      "Write(.claude/templates/**)"
     ]
   }
 }
