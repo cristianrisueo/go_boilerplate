@@ -2,7 +2,7 @@
 SPEC TEMPLATE — Go backend boilerplate
 
 How to use it:
-- Copy to docs/spec.md and fill every section. Write in English.
+- Copy to docs/project-specs.md and fill every section. Write in English.
 - Never remove a section. If it does not apply, write "Not applicable."
   so the agent knows it was considered, not forgotten.
 - Keep the numbering. CLAUDE.md, the skills and the sprint plan cite

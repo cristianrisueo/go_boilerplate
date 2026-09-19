@@ -21,14 +21,14 @@
       "Bash(git log *)",
       "Bash(git show *)",
       "Bash(git branch *)",
-      "Bash(git add docs/sprints/reports/*)",
+      "Bash(git add docs/reports/*)",
       "Bash(git commit *)",
-      "Edit(docs/sprints/reports/**)",
+      "Edit(docs/reports/**)",
       "Agent(go-reviewer)",
       "Bash(grep *)",
       "Bash(printenv CLAUDE_ROLE)",
-      "Edit(docs/sprints/debt.md)",
-      "Bash(git add docs/sprints/debt.md)"
+      "Edit(docs/sprints-debt.md)",
+      "Bash(git add docs/sprints-debt.md)"
     ],
     "deny": ["Edit(.claude/**)", "Edit(CLAUDE.md)"]
   }

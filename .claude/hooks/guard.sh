@@ -9,6 +9,10 @@
 #      path anchoring is easy to get wrong (a single leading slash resolves
 #      relative to the settings FILE, not the project root) -- this hook is
 #      the real floor, independent of that.
+#      One carve-out: the architect writes CLAUDE.md and .claude/rules/,
+#      which are instructions other agents try to follow. It never writes
+#      permissions, hooks, launchers, skills or templates, because an agent
+#      that can widen its own limits has no limits.
 # Exit 0 = no opinion (normal permission flow). Exit 2 = blocked; stderr goes to Claude.
 # Regexes avoid \b so they behave the same with GNU and BSD (macOS) grep.
 
@@ -33,12 +37,17 @@ is_agent_config() {
   [[ "$1" == "CLAUDE.md" || "$1" == ".claude" || "$1" == .claude/* ]]
 }
 
+# The part of the agent configuration the architect may write: project
+# instructions, never the enforced layer.
+is_architect_writable() {
+  [[ "$role" == "architect" && ( "$1" == "CLAUDE.md" || "$1" == .claude/rules/* ) ]]
+}
+
 # True for the immutable project documents. Protected from Bash in every
 # session, including the developer's: a deliberate change always goes
 # through the Edit tool, which settings.json already gates with `ask`.
 is_immutable_doc() {
-  [[ "$1" == "docs/spec.md" || "$1" == "docs/sprints/plan.md" || \
-     "$1" == "docs/templates" || "$1" == docs/templates/* ]]
+  [[ "$1" == "docs/project-specs.md" || "$1" == "docs/sprints-plan.md" ]]
 }
 
 # True if the relative path exists on the main branch.
@@ -54,8 +63,8 @@ if [[ "$tool" == "Edit" || "$tool" == "Write" ]]; then
   if [[ "$rel" == migrations/* ]] && on_main "$rel"; then
     block "$rel is already on main. Committed migrations are never edited; create a new one with 'make migrate-new name=<description>'."
   fi
-  if [[ -n "$role" ]] && is_agent_config "$rel"; then
-    block "$rel is the agent configuration. Only a plain 'claude' developer session may change CLAUDE.md or .claude/."
+  if [[ -n "$role" ]] && is_agent_config "$rel" && ! is_architect_writable "$rel"; then
+    block "$rel is the agent configuration. Only a plain 'claude' developer session may change it; the architect may write CLAUDE.md and .claude/rules/ only."
   fi
   exit 0
 fi
@@ -87,6 +96,7 @@ while IFS= read -r seg; do
   mutating="${S}(rm|mv|cp|truncate|tee|touch|ln)${E}|${S}git${S}+(rm|mv)${E}|${S}sed${S}(.*${S})?-i"
   if [[ -n "$role" ]]; then
     for ref in $(grep -Eo '\.claude/[A-Za-z0-9_./-]+|\.claude|CLAUDE\.md' <<<"$seg" | sort -u); do
+      is_architect_writable "$ref" && continue
       if grep -Eq "$mutating" <<<"$seg" ||
          grep -Eq ">>?${S}*[^&[:space:]]*${ref//./\\.}" <<<"$seg"; then
         block "$ref is the agent configuration. Only a plain 'claude' developer session may change it."
@@ -95,7 +105,7 @@ while IFS= read -r seg; do
   fi
 
   # ---------------------------------- 3. Immutable docs (every session)
-  for ref in $(grep -Eo 'docs/spec\.md|docs/sprints/plan\.md|docs/templates(/[A-Za-z0-9_./-]+)?' <<<"$seg" | sort -u); do
+  for ref in $(grep -Eo 'docs/project-specs\.md|docs/sprints-plan\.md' <<<"$seg" | sort -u); do
     if grep -Eq "$mutating" <<<"$seg" ||
        grep -Eq ">>?${S}*[^&[:space:]]*${ref//./\\.}" <<<"$seg"; then
       block "$ref is immutable. Changes go through the Edit tool, which asks for approval."
@@ -112,7 +122,7 @@ while IFS= read -r seg; do
   done
 
   # ------------------------------------------------ 5. Commit on main
-  if [[ -n "${CLAUDE_ROLE:-}" ]] && grep -Eq "${S}git${S}(.*${S})?commit${E}" <<<"$seg"; then
+  if [[ -n "$role" ]] && grep -Eq "${S}git${S}(.*${S})?commit${E}" <<<"$seg"; then
     if [[ "$(git -C "$root" branch --show-current 2>/dev/null)" == "main" ]]; then
       block "you are on main. Create the sprint branch first, in its own command: git switch -c sprint/NN-<slug>."
     fi

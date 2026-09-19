@@ -25,7 +25,7 @@ if git rev-parse --git-dir >/dev/null 2>&1; then
   fi
 fi
 
-latest="$(ls docs/sprints/reports/sprint-*.md 2>/dev/null | sort | tail -n 1)"
+latest="$(ls docs/reports/sprint-*.md 2>/dev/null | sort | tail -n 1)"
 echo
 if [[ -z "$latest" ]]; then
   echo "### Latest sprint report"

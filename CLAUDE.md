@@ -5,15 +5,15 @@ Claude Code.
 
 ## Sources of truth
 
-- `docs/project_specs.md` — what the service does and how it is built.
-- `docs/sprints_plan.md` — how each sprint is executed, audited and verified.
+- `docs/project-specs.md` — what the service does and how it is built.
+- `docs/sprints-plan.md` — how each sprint is executed, audited and verified.
 - `docs/reports/sprint-NN.md` — what each sprint delivered.
-- `docs/sprints_debt.md` — non-blocking audit findings, cleared in the
+- `docs/sprints-debt.md` — non-blocking audit findings, cleared in the
   hardening sprint.
 - `.claude/templates/` — the standard shape of those documents.
 
-Below, "specs" means `docs/project_specs.md` and "plan" means
-`docs/sprints_plan.md`, cited by section number.
+Below, "specs" means `docs/project-specs.md` and "plan" means
+`docs/sprints-plan.md`, cited by section number.
 
 The specs and the plan are immutable: never edit them. Read the parts you
 need when you need them. If the code and the specs disagree, stop and report
@@ -23,14 +23,14 @@ it; do not silently follow either.
 
 Sessions start through a launcher that sets `CLAUDE_ROLE`:
 
-| Role      | Launcher                   | Entry point        |
-| --------- | -------------------------- | ------------------ |
-| architect | `.claude/bin/architect.sh` | `/design-project`  |
-| builder   | `.claude/bin/builder.sh`   | `/start-sprint NN` |
-| auditor   | `.claude/bin/auditor.sh`   | `/audit-sprint NN` |
-| developer | plain `claude`             | maintenance        |
+| Role        | Launcher                   | Entry point        |
+| ----------- | -------------------------- | ------------------ |
+| designer    | `.claude/bin/design.sh`    | `/design-project`  |
+| implementer | `.claude/bin/implement.sh` | `/start-sprint NN` |
+| auditor     | `.claude/bin/audit.sh`     | `/audit-sprint NN` |
+| developer   | plain `claude`             | maintenance        |
 
-Never merge, push, or commit on `main`. Never edit `.claude/`: the architect
+Never merge, push, or commit on `main`. Never edit `.claude/`: the designer
 is the only role that writes `CLAUDE.md` and `.claude/rules/`, and never the
 permissions, hooks, launchers, skills or templates.
 
@@ -96,7 +96,7 @@ Never run `make reset` or `docker compose down -v`: they wipe the database.
 
 ## Project rules
 
-<!-- ARCHITECT: write this section after the specs and the plan are approved,
+<!-- DESIGNER: write this section after the specs and the plan are approved,
      never before. One rule per invariant of specs §5, stated so that
      go-reviewer and the auditor can check it by reading a diff. Add the
      import rules of specs §8.2 and how database tests get their pool and

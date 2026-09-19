@@ -14,16 +14,21 @@ The configuration expects these documents, at these exact paths and with
 the structure of their templates. The skills, permissions and hooks refer
 to them.
 
-| Document                            | Purpose                                                       | Written by                          | Follows                           |
-| ----------------------------------- | ------------------------------------------------------------- | ----------------------------------- | --------------------------------- |
-| `docs/spec.md`                      | What the service does and how it is built. Immutable.         | Developer, with the design chat     | `docs/templates/spec-template.md` |
-| `docs/sprints/plan.md`              | How each sprint is executed, audited and verified. Immutable. | Developer, with the design chat     | `docs/templates/plan-template.md` |
-| `docs/sprints/reports/sprint-NN.md` | What each sprint delivered and how it was audited.            | `/start-sprint` and `/audit-sprint` | `docs/templates/sprint-report.md` |
+| Document                    | Purpose                                                       | Written by                          | Follows                              |
+| --------------------------- | ------------------------------------------------------------- | ----------------------------------- | ------------------------------------ |
+| `docs/project-specs.md`     | What the service does and how it is built. Immutable.         | Developer, with the design chat     | `.claude/templates/project-specs.md` |
+| `docs/sprints-plan.md`      | How each sprint is executed, audited and verified. Immutable. | Developer, with the design chat     | `.claude/templates/sprints-plan.md`  |
+| `docs/reports/sprint-NN.md` | What each sprint delivered and how it was audited.            | `/start-sprint` and `/audit-sprint` | `.claude/templates/sprint-report.md` |
+| `docs/sprints-debt.md`      | What each audit leaves behind as non-blocking debt.           | `/audit-sprint`                     | `.claude/templates/sprints-debt.md`  |
 
-The three templates live in `docs/templates/`.
+The four templates live in `.claude/templates/`.
 The spec and plan templates are used with the design chat, before any code
-exists. The report template is used by Claude Code on every sprint. Editing
-any template requires explicit approval (`settings.json`).
+exists. The report and debt-ledger templates are used by Claude Code on every
+sprint. Editing any of them takes a plain `claude` developer session:
+`.claude/` is the agent configuration, and `hooks/guard.sh` blocks every
+role — including the architect, which may write `CLAUDE.md` and
+`.claude/rules/` but never the templates, permissions, hooks, launchers or
+skills.
 
 ### What the configuration relies on
 
@@ -157,7 +162,7 @@ A script answers with its exit code: `0` means "go ahead"; `2` means
 - **What it does:** audits a finished sprint with checks A1–A10 of plan §4.
   It re-runs the verification, checks that each test really tests what it
   claims, runs `go-reviewer`, and appends the verdict to the sprint report
-  using section 2 of `docs/templates/sprint-report.md`.
+  using section 2 of `.claude/templates/sprint-report.md`.
 - **Why:** it does not trust what the builder says; it checks it.
 - **Worth it?** Yes, if you work in sprints. It is half of the process.
 
@@ -169,14 +174,14 @@ A script answers with its exit code: `0` means "go ahead"; `2` means
 
 - **What it does:** runs a sprint of the plan from start to finish: branch,
   tests first, code, verification, probes, report and commit. The report
-  follows section 1 of `docs/templates/sprint-report.md`. If the audit
+  follows section 1 of `.claude/templates/sprint-report.md`. If the audit
   requested changes, it runs the fix round instead and appends section 3.
 - **Why:** it replaces copying prompts from a chat. The process lives in the
   repository, so anyone can run it.
 - **Worth it?** Yes, if you work in sprints. It is the other half of the
   process.
 
-### `docs/templates/sprint-report.md` (outside `.claude/`)
+### `templates/sprint-report.md`
 
 - **What it does:** defines the exact shape of a sprint report in three
   parts: the initial report, an audit round and a fix round.
@@ -185,6 +190,17 @@ A script answers with its exit code: `0` means "go ahead"; `2` means
   keeps them in sync; change the format there and nowhere else.
 - **Worth it?** Yes, if you work in sprints. Without it, a heading written
   slightly differently silently breaks the session context.
+
+### `templates/sprints-debt.md`
+
+- **What it does:** defines the debt ledger, `docs/sprints-debt.md`: one row
+  per non-blocking audit finding, with its sprint, location and status.
+  `/audit-sprint` appends to it in step 4b.
+- **Why:** a non-blocking finding is real, but not worth halting a sprint
+  for. Without a ledger it is written once into a report nobody opens again,
+  and never fixed.
+- **Worth it?** Yes, if you work in sprints. It is what makes the hardening
+  sprint possible: the list of what to clean up is already written.
 
 ### `hooks/session-context.sh`
 
@@ -196,16 +212,17 @@ A script answers with its exit code: `0` means "go ahead"; `2` means
 - **Worth it?** Yes, although it is the least critical hook: if it fails,
   Claude still works, it just finds its way less easily.
 
-### `roles/builder.json` and `roles/auditor.json`
+### `roles/architect.json`, `roles/builder.json` and `roles/auditor.json`
 
-- **What they do:** the permissions of each role. The builder can build
-  and test without asking; the auditor can only read, verify and write its
-  verdict.
+- **What they do:** the permissions of each role. The architect writes the
+  documents, `CLAUDE.md` and `.claude/rules/`, and no code; the builder can
+  build and test without asking; the auditor can only read, verify and write
+  its verdict.
 - **Why:** the auditor cannot touch the code, even if it tried.
 - **Worth it?** Yes, if you use two terminals. With a single terminal they
   are not needed.
 
-### `bin/builder.sh` and `bin/auditor.sh`
+### `bin/architect.sh`, `bin/builder.sh` and `bin/auditor.sh`
 
 - **What they do:** start Claude with the right role, permissions and mode,
   so you do not have to remember any of it.
@@ -216,8 +233,9 @@ A script answers with its exit code: `0` means "go ahead"; `2` means
 
 How to use them, from the project root:
 
-| Terminal    | Start                                           | Then run           |
+| Session     | Start                                           | Then run           |
 | ----------- | ----------------------------------------------- | ------------------ |
+| architect   | `.claude/bin/architect.sh` (before sprint 00)   | `/design-project`  |
 | 1 — builder | `.claude/bin/builder.sh`                        | `/start-sprint NN` |
 | 2 — auditor | `.claude/bin/auditor.sh` (on the sprint branch) | `/audit-sprint NN` |
 

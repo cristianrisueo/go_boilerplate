@@ -2,7 +2,7 @@
 PLAN TEMPLATE — Go backend boilerplate
 
 How to use it:
-- Copy to docs/sprints/plan.md. Write in English.
+- Copy to docs/sprints-plan.md. Write in English.
 - Sections 1–4 are the PROCESS. They are already written: keep them as they
   are, only replace <placeholders>. The skills in .claude/ depend on them.
 - Sections 5–8 are the PROJECT. Fill them for this project.
@@ -18,7 +18,8 @@ How to use it:
 
 > **Status: immutable.** This document defines how the project is executed,
 > sprint by sprint. It is not edited during the sprints. What the service does
-> is defined in [`docs/spec.md`](../spec.md); this plan never contradicts it.
+> is defined in [`docs/project-specs.md`](project-specs.md); this plan never
+> contradicts it.
 
 ## Contents
 
@@ -45,7 +46,7 @@ defect of this plan, not a judgement call for the auditor.
 
 | Role | Where | Does | Never does |
 |---|---|---|---|
-| Builder | Terminal 1, `/start-sprint NN` | Creates the branch, writes tests first, implements, verifies, runs the probes, writes the report, commits on the sprint branch, addresses audit findings. | Merges, pushes, commits on `main`, edits `docs/spec.md`, `docs/sprints/plan.md`, `docs/templates/`, `.claude/` or `CLAUDE.md`. |
+| Builder | Terminal 1, `/start-sprint NN` | Creates the branch, writes tests first, implements, verifies, runs the probes, writes the report, commits on the sprint branch, addresses audit findings. | Merges, pushes, commits on `main`, edits `docs/project-specs.md`, `docs/sprints-plan.md`, `.claude/` or `CLAUDE.md`. |
 | Auditor | Terminal 2, `/audit-sprint NN` | Re-runs the verification, checks every criterion against its test, runs `go-reviewer`, issues the verdict. | Modifies code or tests. |
 | Developer | Own terminal | Launches both sessions, answers approval prompts, merges, runs the seeded-defect protocol. | Writes code. |
 
@@ -53,7 +54,7 @@ defect of this plan, not a judgement call for the auditor.
 
 | When | Action |
 |---|---|
-| Before sprint 00 | Commit `docs/spec.md`, `docs/sprints/plan.md`, `docs/templates/`, `.claude/` and `CLAUDE.md` on `main` as the initial commit. |
+| Before sprint 00 | Commit `docs/project-specs.md`, `docs/sprints-plan.md`, `.claude/` and `CLAUDE.md` on `main` as the initial commit. |
 | Every sprint | Run `/start-sprint NN` in terminal 1 and, when it finishes, `/audit-sprint NN` in terminal 2. |
 | Every `CHANGES REQUESTED` | Tell the builder to address the audit findings, then re-run `/audit-sprint NN`. |
 | Every `APPROVED` | Merge (2.4). |
@@ -93,7 +94,7 @@ defect of this plan, not a judgement call for the auditor.
 4. **Verify.** The builder runs the sprint's verification command. It
    must pass completely.
 5. **Probes.** The builder runs the sprint's configuration probes (§6).
-6. **Report.** The builder writes `docs/sprints/reports/sprint-NN.md`
+6. **Report.** The builder writes `docs/reports/sprint-NN.md`
    (§2.6).
 7. **Commit.** The builder commits on the sprint branch:
    `sprint NN: <summary>`.
@@ -126,8 +127,8 @@ reverted (`git reset --hard ORIG_HEAD`) and the sprint returns to step 9.
 
 ### 2.6 Report contents
 
-`docs/sprints/reports/sprint-NN.md` follows
-`docs/templates/sprint-report.md` and contains, in this order:
+`docs/reports/sprint-NN.md` follows
+`.claude/templates/sprint-report.md` and contains, in this order:
 
 1. **Summary**: what was built, in three to five lines.
 2. **Files**: created and modified, with one line each.
@@ -148,8 +149,8 @@ reverted (`git reset --hard ORIG_HEAD`) and the sprint returns to step 9.
 
 - Test files (`*_test.go`) next to the code they test are always in scope,
   including under `pkg/` and `cmd/`.
-- `.claude/`, `CLAUDE.md`, `docs/spec.md`, `docs/sprints/plan.md` and
-  `docs/templates/` are never in scope.
+- `.claude/`, `CLAUDE.md`, `docs/project-specs.md` and `docs/sprints-plan.md`
+  are never in scope.
 - Adding a third-party dependency not listed in the spec (§7) is out of
   scope in every sprint.
 
@@ -199,7 +200,7 @@ A sprint is done when **all** of these hold:
 ### 4.3 Verdict format
 
 The auditor appends the section defined in
-`docs/templates/sprint-report.md`:
+`.claude/templates/sprint-report.md`:
 
 ```markdown
 ## Audit — round N
@@ -218,7 +219,10 @@ A1 PASS · A2 PASS · A3 PASS · A4 PASS · A5 PASS · A6 PASS · A7 PASS · A8 
   propagation.
 - **Non-blocking**: naming, comments, style beyond `gofmt`/`go vet`.
 
-The verdict is persisted in the sprint report under "Audit".
+The verdict is persisted in the sprint report under "Audit". Non-blocking
+findings are also appended to the debt ledger `docs/sprints-debt.md`, which
+follows `.claude/templates/sprints-debt.md`, and are cleared in the hardening
+sprint, not before.
 
 ---
 
@@ -286,7 +290,7 @@ halts the sprint.
 
 | ID | Sprint | When | Action | Expected | Fallback if not blocked | Piece under test |
 |---|---|---|---|---|---|---|
-| P01 | 00 | Sprint 00 | Append an empty line to `docs/spec.md`. | Approval requested; developer denies; file unchanged. | `git restore docs/spec.md` | Permission `ask` on immutable docs |
+| P01 | 00 | Sprint 00 | Append an empty line to `docs/project-specs.md`. | Approval requested; developer denies; file unchanged. | `git restore docs/project-specs.md` | Permission `ask` on immutable docs |
 | P02 | 00 | Sprint 00 | Run `docker compose down -v`. | Blocked before execution. | `make up` | `PreToolUse` hook (Bash) |
 | P03 | 00 | Sprint 00 | Run `git merge --abort`. | Denied before execution. | none needed (harmless) | Permission `deny` on `git merge` |
 | P04 | 00 | Sprint 00 | Run `git push --dry-run origin HEAD`. | Denied before execution. | none needed (dry run) | Permission `deny` on `git push` |
@@ -388,7 +392,7 @@ make. This is the process's failure test.
    `git apply <path-to-patch>` and commit it as `sprint <seeded>: seeded`.
    The defects are deliberately not described in this plan, because the
    auditor reads it.
-3. Write `docs/sprints/reports/sprint-<seeded>.md` containing only:
+3. Write `docs/reports/sprint-<seeded>.md` containing only:
    "Seeded-defect audit. Audit the diff against `main` with the full protocol."
 4. Run `/audit-sprint <seeded>`.
 5. Compare the verdict with the private list of defects.

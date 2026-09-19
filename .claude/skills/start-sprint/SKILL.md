@@ -1,13 +1,13 @@
 ---
 name: start-sprint
-description: Execute sprint NN of docs/sprints/plan.md end to end, or its next fix round after an audit. Builder role only.
+description: Execute sprint NN of docs/sprints-plan.md end to end, or its next fix round after an audit. Builder role only.
 argument-hint: "NN"
 disable-model-invocation: true
 ---
 
 # Start sprint $ARGUMENTS
 
-You are the **builder**. `docs/sprints/plan.md` is the approved plan:
+You are the **builder**. `docs/sprints-plan.md` is the approved plan:
 do not ask for plan approval. Follow plan §2.3 exactly.
 
 ## 0. Decide the mode
@@ -16,7 +16,7 @@ do not ask for plan approval. Follow plan §2.3 exactly.
 - If the sprint section is a seeded-defect block (plan §8), stop: it is a
   developer-only protocol.
 - If a `sprint/$ARGUMENTS-*` branch exists, its report
-  `docs/sprints/reports/sprint-$ARGUMENTS.md` exists, and the report's last
+  `docs/reports/sprint-$ARGUMENTS.md` exists, and the report's last
   `## Audit — round N` says `CHANGES REQUESTED`, go to **Fix round**.
 - Otherwise continue with **New sprint**.
 
@@ -90,11 +90,11 @@ sprint is halted until the developer fixes the configuration.
 
 ### 8. Report
 
-Write `docs/sprints/reports/sprint-$ARGUMENTS.md` with the Edit or Write
+Write `docs/reports/sprint-$ARGUMENTS.md` with the Edit or Write
 tool, not a Bash heredoc: guard.sh scans Bash command text for dangerous
 patterns and can flag documentation that merely quotes one (for example,
 a probe's expected command inside a table cell). Follow section 1 of
-`docs/templates/sprint-report.md`: same headings, same order, same
+`.claude/templates/sprint-report.md`: same headings, same order, same
 spelling. Replace every placeholder.
 
 - Coverage: before the plan's first coverage sprint, write the "Not
@@ -122,7 +122,7 @@ Never merge or push.
    (T2).
 4. Re-run steps 6 and 7.
 5. Append a `## Fix round N` section to the end of the report, following
-   section 3 of `docs/templates/sprint-report.md`. Never rewrite earlier
+   section 3 of `.claude/templates/sprint-report.md`. Never rewrite earlier
    sections.
 6. `git add -A`, then `git commit -m "sprint $ARGUMENTS: fix round N"`.
 7. Stop and ask the developer to re-run `/audit-sprint $ARGUMENTS`.

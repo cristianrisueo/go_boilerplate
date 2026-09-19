@@ -1,6 +1,6 @@
 # Sprint report template
 
-Single source for the format of `docs/sprints/reports/sprint-NN.md`
+Single source for the format of `docs/reports/sprint-NN.md`
 (plan §2.6 and §4.3). Used by `/start-sprint` and `/audit-sprint`.
 
 Headings must be copied **exactly**: `.claude/hooks/session-context.sh`

@@ -23,9 +23,9 @@ Use only read-only commands: `git diff`, `git log`, `git show`,
 1. Read the "Project rules" section of `CLAUDE.md`. Those rules are part of
    this review.
 2. If the diff touches a `repository.go`, read `.claude/rules/repository.md`.
-3. Read `docs/spec.md` §5 (Invariants): every rule there is blocking.
-4. Read other parts of `docs/spec.md` when a finding depends on expected
-   behaviour.
+3. Read `docs/project-specs.md` §5 (Invariants): every rule there is blocking.
+4. Read other parts of `docs/project-specs.md` when a finding depends on
+   expected behaviour.
 
 ## What to check
 

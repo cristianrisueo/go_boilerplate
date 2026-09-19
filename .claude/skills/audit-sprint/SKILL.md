@@ -1,6 +1,6 @@
 ---
 name: audit-sprint
-description: Audit sprint NN against docs/sprints/plan.md §4 and persist the verdict in its report. Auditor role only.
+description: Audit sprint NN against docs/sprints-plan.md §4 and persist the verdict in its report. Auditor role only.
 argument-hint: "NN"
 disable-model-invocation: true
 ---
@@ -14,7 +14,7 @@ or tests and never fix anything: you find, classify and report.
 ## 0. Preconditions
 
 - `CLAUDE_ROLE` is `auditor` and the current branch is `sprint/$ARGUMENTS-*`.
-- `docs/sprints/reports/sprint-$ARGUMENTS.md` exists.
+- `docs/reports/sprint-$ARGUMENTS.md` exists.
 - The working tree is clean, except the report itself when it is untracked
   (seeded-defect audit). Anything else means the builder may still be
   working: stop and say so.
@@ -58,24 +58,25 @@ halted: add the line the template gives for that case.
 ## 4. Persist
 
 Append an `## Audit — round N` section to the end of the report, following
-section 2 of `docs/templates/sprint-report.md` exactly. The
+section 2 of `.claude/templates/sprint-report.md` exactly. The
 `SessionStart` hook reads its `**Verdict:**` line.
 
 ## 4b. Record non-blocking debt
 
 For every non-blocking finding of this round that calls for a change to the
-code, append one row to the table in `docs/sprints/debt.md`: sprint number,
-location, a one-line finding, status `Open`. Skip a finding when the audit
-itself justifies the current behaviour, or when it belongs to another list
-(a weak metric, a plan defect, a naming choice the plan prescribes). Skip
-this step entirely if no finding qualifies.
+code, append one row to the table in `docs/sprints-debt.md`, which follows
+`.claude/templates/sprints-debt.md`: sprint number, location, a one-line
+finding, status `Open`. Skip a finding when the audit itself justifies the
+current behaviour, or when it belongs to another list (a weak metric, a plan
+defect, a naming choice the plan prescribes). Skip this step entirely if no
+finding qualifies.
 
 ## 5. Commit the report and the ledger
 
-Include `docs/sprints/debt.md` in both commands only if step 4b touched it.
+Include `docs/sprints-debt.md` in both commands only if step 4b touched it.
 
-1. `git add docs/sprints/reports/sprint-$ARGUMENTS.md docs/sprints/debt.md`
-2. `git commit -m "sprint $ARGUMENTS: audit round N" -- docs/sprints/reports/sprint-$ARGUMENTS.md docs/sprints/debt.md`
+1. `git add docs/reports/sprint-$ARGUMENTS.md docs/sprints-debt.md`
+2. `git commit -m "sprint $ARGUMENTS: audit round N" -- docs/reports/sprint-$ARGUMENTS.md docs/sprints-debt.md`
 
 Then show the verdict and the findings table to the developer.
 Never merge.

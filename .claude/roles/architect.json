@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(go version)",
+      "Bash(go doc *)",
+      "Bash(go list *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(ls *)",
+      "Bash(wc *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git branch *)",
+      "Bash(git add docs/*)",
+      "Bash(git add CLAUDE.md)",
+      "Bash(git add .claude/rules/*)",
+      "Bash(git commit *)",
+      "Bash(printenv CLAUDE_ROLE)",
+      "Edit(docs/**)",
+      "Edit(CLAUDE.md)",
+      "Edit(.claude/rules/**)",
+      "Agent(Explore)"
+    ],
+    "deny": [
+      "Edit(.claude/settings.json)",
+      "Edit(.claude/settings.local.json)",
+      "Edit(.claude/roles/**)",
+      "Edit(.claude/hooks/**)",
+      "Edit(.claude/bin/**)",
+      "Edit(.claude/skills/**)",
+      "Edit(.claude/agents/**)",
+      "Edit(.claude/templates/**)"
+    ]
+  }
+}
