@@ -16,13 +16,13 @@ to them.
 
 | Document                    | Purpose                                                       | Written by                          | Follows                              |
 | --------------------------- | ------------------------------------------------------------- | ----------------------------------- | ------------------------------------ |
-| `docs/project-specs.md`     | What the service does and how it is built. Immutable.         | Developer, with the design chat     | `.claude/templates/project-specs.md` |
-| `docs/sprints-plan.md`      | How each sprint is executed, audited and verified. Immutable. | Developer, with the design chat     | `.claude/templates/sprints-plan.md`  |
+| `docs/project-specs.md`     | What the service does and how it is built. Immutable.         | `/design-project` (architect)       | `.claude/templates/project-specs.md` |
+| `docs/sprints-plan.md`      | How each sprint is executed, audited and verified. Immutable. | `/design-project` (architect)       | `.claude/templates/sprints-plan.md`  |
 | `docs/reports/sprint-NN.md` | What each sprint delivered and how it was audited.            | `/start-sprint` and `/audit-sprint` | `.claude/templates/sprint-report.md` |
 | `docs/sprints-debt.md`      | What each audit leaves behind as non-blocking debt.           | `/audit-sprint`                     | `.claude/templates/sprints-debt.md`  |
 
 The four templates live in `.claude/templates/`.
-The spec and plan templates are used with the design chat, before any code
+The specs and plan templates are used by the architect, before any code
 exists. The report and debt-ledger templates are used by Claude Code on every
 sprint. Editing any of them takes a plain `claude` developer session:
 `.claude/` is the agent configuration, and `hooks/guard.sh` blocks every
@@ -38,11 +38,11 @@ write `Not applicable.` inside it.
 
 | Element                                                                         | Used by                                                                                                                               |
 | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Spec §5 Invariants                                                              | `go-reviewer`, audit check A6, "Project rules" in `CLAUDE.md`                                                                         |
-| Spec §6.1 Response format and §6.3 Error catalogue                              | `CLAUDE.md`, audit check A5, test rule T4                                                                                             |
-| Spec §7 Tech stack                                                              | Scope rule: no dependency outside this list                                                                                           |
-| Spec §9 Directory structure                                                     | Audit check A8                                                                                                                        |
-| Spec §12.3 Makefile targets                                                     | `stop-tests.sh`, `guard.sh`, `CLAUDE.md` and both sprint skills (`check`, `test-short`, `test`, `up`, `down`, `reset`, `migrate-new`) |
+| Specs §5 Invariants                                                             | `go-reviewer`, audit check A6, "Project rules" in `CLAUDE.md`                                                                         |
+| Specs §6.1 Response format and §6.3 Error catalogue                             | `CLAUDE.md`, audit check A5, test rule T4                                                                                             |
+| Specs §7 Tech stack                                                             | Scope rule: no dependency outside this list                                                                                           |
+| Specs §9 Directory structure                                                    | Audit check A8                                                                                                                        |
+| Specs §12.3 Makefile targets                                                    | `stop-tests.sh`, `guard.sh`, `CLAUDE.md` and both sprint skills (`check`, `test-short`, `test`, `up`, `down`, `reset`, `migrate-new`) |
 | Plan §2.1–§2.7, §3, §4, §5, §6                                                  | `/start-sprint` and `/audit-sprint`                                                                                                   |
 | Report headings `## Summary`, `## Deviations`, `## Open issues`, `**Verdict:**` | `hooks/session-context.sh`                                                                                                            |
 
@@ -60,12 +60,12 @@ follow it, but nothing forces it to.
 ### `CLAUDE.md` (project root)
 
 - **What it does:** the first thing Claude reads in every session. It points
-  to the spec and the plan, lists the commands to use, and describes how Go
+  to the specs and the plan, lists the commands to use, and describes how Go
   is written in this project.
 - **Why:** without it, Claude guesses the conventions and every session
   starts from zero.
 - **Worth it?** Yes, essential. Its "Project rules" section is the main
-  thing to fill in for each project, derived from spec §5.
+  thing to fill in for each project, derived from specs §5.
 
 ### `rules/repository.md`
 
@@ -75,7 +75,7 @@ follow it, but nothing forces it to.
 - **Why:** the data layer is where an agent makes the most expensive
   mistakes (unsafe SQL, a missing access filter). These instructions should
   not take up context while Claude works on other layers. Its "Project
-  requirement" is filled in for each project, from spec §5.
+  requirement" is filled in for each project, from specs §5.
 - **Worth it?** Yes. Almost every Go backend has a database, and this is the
   only rule we keep.
 
@@ -99,9 +99,8 @@ model.
 ### `settings.json`
 
 - **What it does:** rules for every session. It asks for approval before
-  editing the spec, the plan or the templates, forbids `git push` and
-  `git merge`, and prevents disabling the permission system. It also
-  connects the hooks.
+  editing the specs and the plan, forbids `git push` and `git merge`, and
+  prevents disabling the permission system. It also connects the hooks.
 - **Why:** these are the project's red lines. They must apply to everyone,
   always.
 - **Worth it?** Yes, essential.
@@ -120,9 +119,12 @@ A script answers with its exit code: `0` means "go ahead"; `2` means
 
 ### `hooks/guard.sh`
 
-- **What it does:** before every command or edit, it blocks three things:
-  wiping the database (`docker compose down -v`, `make reset`), changing a
-  migration that is already on `main`, and committing on `main`.
+- **What it does:** before every command or edit, it blocks five things:
+  wiping the database (`docker compose down -v`, `make reset`); changing a
+  migration that is already on `main`; committing on `main`; editing the
+  agent configuration, in every role except the architect, which may write
+  `CLAUDE.md` and `.claude/rules/`; and writing to the two immutable
+  documents from the shell, in every session.
 - **Why:** a permission rule only compares text. This script can reason, for
   example by asking git whether a migration is already on `main`.
 - **Worth it?** Yes, essential. It prevents the most expensive mistakes:
@@ -150,7 +152,7 @@ A script answers with its exit code: `0` means "go ahead"; `2` means
 ### `agents/go-reviewer.md`
 
 - **What it does:** a second Claude, unable to edit, that reviews the code
-  against Go conventions, spec §5 and the "Project rules" of `CLAUDE.md`,
+  against Go conventions, specs §5 and the "Project rules" of `CLAUDE.md`,
   and returns a list of problems.
 - **Why:** whoever writes the code is not a good judge of it. This reviewer
   has not seen how the code was written.
@@ -169,6 +171,20 @@ A script answers with its exit code: `0` means "go ahead"; `2` means
 ---
 
 ## 4. How the work is done
+
+### `skills/design-project/SKILL.md`
+
+- **What it does:** turns a design conversation into `docs/project-specs.md`
+  and `docs/sprints-plan.md`, then derives the "Project rules" of
+  `CLAUDE.md` and the project requirement of `.claude/rules/repository.md`,
+  and prepares `docs/reports/` and `docs/sprints-debt.md`. It pauses once,
+  after the specs. Invoked again on a project under way, it revises only the
+  sprints that have no report yet.
+- **Why:** every later piece cites the specs and the plan by section number.
+  If those two documents are vague, the audit has nothing to check against
+  and every sprint argues about what was meant.
+- **Worth it?** Yes, essential. It is the one step that decides what all the
+  others are measured against.
 
 ### `skills/start-sprint/SKILL.md`
 
@@ -206,9 +222,12 @@ A script answers with its exit code: `0` means "go ahead"; `2` means
 
 - **What it does:** when a session starts, or after `/clear`, it tells
   Claude the current branch, the latest commits and how the last sprint
-  ended, taken from the report headings defined in the template.
+  ended, taken from the report headings defined in the template. It also
+  warns when a session has no role on a `sprint/*` branch.
 - **Why:** the conversation is cleared on every sprint. Without this, Claude
-  would start without knowing where things stand.
+  would start without knowing where things stand. The warning catches the
+  case where someone starts `claude` instead of a launcher, and every
+  command is then denied without explanation.
 - **Worth it?** Yes, although it is the least critical hook: if it fails,
   Claude still works, it just finds its way less easily.
 
@@ -219,8 +238,9 @@ A script answers with its exit code: `0` means "go ahead"; `2` means
   build and test without asking; the auditor can only read, verify and write
   its verdict.
 - **Why:** the auditor cannot touch the code, even if it tried.
-- **Worth it?** Yes, if you use two terminals. With a single terminal they
-  are not needed.
+- **Worth it?** Yes. The architect runs once, before sprint 00; the builder
+  and the auditor run in two parallel terminals. With a single session doing
+  everything, they are not needed.
 
 ### `bin/architect.sh`, `bin/builder.sh` and `bin/auditor.sh`
 
@@ -229,7 +249,7 @@ A script answers with its exit code: `0` means "go ahead"; `2` means
 - **Why:** the role files do nothing on their own; something has to load
   them. These scripts always do it the same way.
 - **Worth it?** Yes, they go together with the roles: remove one and the
-  other is useless.
+  other is useless. One launcher per role, named after it.
 
 How to use them, from the project root:
 
