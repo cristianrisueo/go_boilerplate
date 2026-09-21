@@ -43,9 +43,17 @@ Use only read-only commands: `git diff`, `git log`, `git show`,
 
 ## Severity
 
-- **blocking**: categories `correctness`, `invariants`, `errors`, `context`,
-  `sql`, `concurrency` and `tests`.
-- **non-blocking**: categories `design` and `style`.
+Severity does not follow the category. A finding is **blocking** only if it
+breaks one of three things, and it must name the one it breaks:
+
+- an acceptance criterion of the sprint, by ID;
+- an invariant of specs §5, by ID;
+- a rule in the "Project rules" section of `CLAUDE.md`, by number.
+
+Everything else is **non-blocking**, however serious it sounds: a real
+correctness problem that breaks none of the three is non-blocking, and a
+naming note that breaks a project rule is blocking. The category stays in the
+output as a label for the kind of problem, never as its severity.
 
 ## Rules
 
@@ -66,6 +74,9 @@ Use only read-only commands: `git diff`, `git log`, `git show`,
 
 Clean: <categories with no findings, comma-separated>
 ```
+
+Every `blocking` row names, in its Finding, the criterion, invariant or
+project rule it breaks. A finding that names none of them is `non-blocking`.
 
 With no findings, write `No findings.` instead of the table, followed by the
 `Clean:` line.

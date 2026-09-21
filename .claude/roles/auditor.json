@@ -30,6 +30,15 @@
       "Edit(docs/sprints-debt.md)",
       "Bash(git add docs/sprints-debt.md)"
     ],
-    "deny": ["Edit(.claude/**)", "Edit(CLAUDE.md)"]
+    "deny": [
+      "Edit(.claude/**)",
+      "Write(.claude/**)",
+      "Edit(CLAUDE.md)",
+      "Write(CLAUDE.md)",
+      "Edit(docs/project-specs.md)",
+      "Write(docs/project-specs.md)",
+      "Edit(docs/sprints-plan.md)",
+      "Write(docs/sprints-plan.md)"
+    ]
   }
 }

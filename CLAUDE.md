@@ -23,12 +23,12 @@ it; do not silently follow either.
 
 Sessions start through a launcher that sets `CLAUDE_ROLE`:
 
-| Role        | Launcher                   | Entry point        |
-| ----------- | -------------------------- | ------------------ |
-| designer    | `.claude/bin/design.sh`    | `/design-project`  |
-| implementer | `.claude/bin/implement.sh` | `/start-sprint NN` |
-| auditor     | `.claude/bin/audit.sh`     | `/audit-sprint NN` |
-| developer   | plain `claude`             | maintenance        |
+| Role      | Launcher                   | Entry point                                |
+| --------- | -------------------------- | ------------------------------------------ |
+| architect | `.claude/bin/architect.sh` | `/design-project` then `/scaffold-project` |
+| builder   | `.claude/bin/builder.sh`   | `/start-sprint NN`                         |
+| auditor   | `.claude/bin/auditor.sh`   | `/audit-sprint NN`                         |
+| developer | plain `claude`             | maintenance                                |
 
 Never merge, push, or commit on `main`. In a role session, never edit
 `.claude/`: the architect is the only role that writes `CLAUDE.md` and

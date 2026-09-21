@@ -34,9 +34,10 @@ if [[ -z "$latest" ]]; then
 fi
 
 echo "### Latest sprint report: $latest (key sections; read the file for the rest)"
-# Summary, Deviations and Open issues in full, plus every audit verdict line.
+# The Summary section in full, plus every audit verdict line. Nothing else:
+# a session that needs the deviations or the open issues reads the report.
 awk '
-  /^## /       { show = ($0 ~ /^## (Summary|Deviations|Open issues)/) }
+  /^## /       { show = ($0 ~ /^## Summary/) }
   /^\*\*Verdict:\*\*/ { print "Audit " $0; next }
   show         { print }
 ' "$latest"
