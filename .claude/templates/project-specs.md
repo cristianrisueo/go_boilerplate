@@ -1,12 +1,22 @@
 <!--
 SPEC TEMPLATE — Go backend boilerplate
 
+This template is the contract for `/scaffold-project`. The specs are filled
+in either by `/design-project` or by hand, in a chat, following this
+template. `/scaffold-project` then reads them and generates everything else
+from them: `docs/sprints-plan.md`, `docs/sprints-debt.md`, `docs/reports/`,
+the "Project rules" section of `CLAUDE.md` and `.claude/rules/repository.md`.
+
 How to use it:
 - Copy to docs/project-specs.md and fill every section. Write in English.
+- Every section must be present, with the same numbering. CLAUDE.md, the
+  skills and the sprint plan cite sections by number (§5, §6.1, §6.3, §7,
+  §9, §12.3).
 - Never remove a section. If it does not apply, write "Not applicable."
   so the agent knows it was considered, not forgotten.
-- Keep the numbering. CLAUDE.md, the skills and the sprint plan cite
-  sections by number (§5, §6.1, §6.3, §7, §9, §12.3).
+- A section marked REQUIRED in its own comment may not say "Not
+  applicable": `/scaffold-project` generates from it. They are §1 (module
+  path), §5, §6.2, §6.3, §7, §8.2, §9, §12.3 and §13.3.
 - Subsections marked "fixed" keep their number and title.
 - Delete these comments when the spec is final.
 -->
@@ -14,13 +24,15 @@ How to use it:
 # <project-name> — Specification
 
 > **Status: immutable.** This document is the system of record for what the
-> service does and how it is built. It is not edited during the sprints.
-> Any change in scope requires a new specification.
+> service does and how it is built. It is never edited during a sprint.
+> Between sprints the developer or the architect may change it and then
+> re-run `/scaffold-project`, which regenerates only the pending part of the
+> plan and the derived rules. Every change is recorded in §14.1.
 
 ## 1. Purpose
 
 <!-- What the service is and why it exists, in a few lines.
-     Include the Go module path. -->
+     Include the Go module path. REQUIRED: the module path. -->
 
 Go module: `github.com/<owner>/<project>`
 
@@ -66,13 +78,22 @@ Constraints and indexes:
 
 ## 5. Invariants
 
-<!-- Rules that admit NO exceptions: data isolation, security, integrity,
-     idempotency. go-reviewer treats every rule here as blocking, and the
-     "Project rules" section of CLAUDE.md is derived from this one. -->
+<!-- REQUIRED. Rules that admit NO exceptions: data isolation, security,
+     integrity, idempotency. go-reviewer treats every rule here as blocking,
+     and the "Project rules" section of CLAUDE.md is derived from this one.
+
+     Use the format that makes an invariant checkable against a diff:
+     - Numbered I1…In, one invariant per bullet.
+     - Each written as a prohibition on what code may do, not as a property
+       of the system: "no SELECT decides whether an INSERT happens", not
+       "the system never double-books".
+     - Each naming the database constraint or object that enforces it, when
+       one exists. -->
 
 Rules that admit no exceptions.
 
-- 
+- **I1.** No `SELECT` decides whether an `INSERT` happens: a duplicate is
+  rejected by the unique constraint `<constraint_name>` on `<table>`.
 
 ## 6. API
 
@@ -87,7 +108,7 @@ Rules that admit no exceptions.
 
 ### 6.2 Operations
 
-<!-- fixed. Endpoints, RPCs or consumed/published events. -->
+<!-- fixed, REQUIRED. Endpoints, RPCs or consumed/published events. -->
 
 | Method | Path | Success | Errors |
 |---|---|---|---|
@@ -95,8 +116,10 @@ Rules that admit no exceptions.
 
 ### 6.3 Error catalogue
 
-<!-- fixed. Every error code the service can return. The test plan requires
-     each code to be provoked by at least one test. -->
+<!-- fixed, REQUIRED. Every error code the service can return. Codes are
+     unique snake_case strings and the list is closed: a code that is not in
+     this table is never returned. The test plan requires each code to be
+     provoked by at least one test. -->
 
 | Code | HTTP | When |
 |---|---|---|
@@ -106,8 +129,8 @@ Rules that admit no exceptions.
 
 ## 7. Tech stack
 
-<!-- Versions and the CLOSED list of third-party dependencies. Adding a
-     dependency not listed here is out of scope in every sprint. -->
+<!-- REQUIRED. Versions and the CLOSED list of third-party dependencies.
+     Adding a dependency not listed here is out of scope in every sprint. -->
 
 | Concern | Choice |
 |---|---|
@@ -115,7 +138,7 @@ Rules that admit no exceptions.
 | HTTP | |
 | Database | PostgreSQL <version> |
 | Driver | |
-| Migrations | |
+| Migrations | `github.com/golang-migrate/migrate/v4` — **fixed**, because the targets of §12.3 depend on it. |
 | Logging | `log/slog` |
 | Tests | `testing` and `net/http/httptest` |
 
@@ -130,8 +153,9 @@ No other third-party dependencies.
 
 ### 8.2 Dependencies
 
-<!-- Allowed imports between layers and packages, where components are
-     wired together, and the rule for introducing interfaces. -->
+<!-- REQUIRED. Allowed imports between layers and packages, where
+     components are wired together, and the rule for introducing
+     interfaces. -->
 
 ### 8.3 Errors
 
@@ -148,8 +172,8 @@ No other third-party dependencies.
 
 ## 9. Directory structure
 
-<!-- The planned tree and one line per file or directory. The auditor
-     checks the scope of each sprint against it (A8). -->
+<!-- REQUIRED. The planned tree and one line per file or directory. The
+     auditor checks the scope of each sprint against it (A8). -->
 
 ```
 <project>/
@@ -158,12 +182,10 @@ No other third-party dependencies.
 ├── pkg/
 ├── migrations/
 ├── docs/
-│   ├── spec.md
-│   ├── notes/
-│   ├── sprints/
-│   │   ├── plan.md
-│   │   └── reports/
-│   └── templates/
+│   ├── project-specs.md
+│   ├── sprints-plan.md
+│   ├── sprints-debt.md
+│   └── reports/
 ├── .claude/
 ├── CLAUDE.md
 ├── Dockerfile
@@ -230,8 +252,8 @@ Planned migrations:
 
 ### 12.3 Makefile
 
-<!-- fixed. The hooks and skills call these targets. All of them must
-     exist with this meaning; add project targets below them. -->
+<!-- fixed, REQUIRED. The hooks and skills call these targets. All of them
+     must exist with this meaning; add project targets below them. -->
 
 | Target | Command | Notes |
 |---|---|---|
@@ -242,6 +264,14 @@ Planned migrations:
 | `test-short` | `go test -short -count=1 ./...` | No database, no Docker, no network. |
 | `test` | start `db`, then `go test -race -count=1 ./...` | Full suite. |
 | `migrate-new` | `go tool migrate create -ext sql -dir migrations -seq -digits 6 $(name)` | Fails if `name` is empty. |
+| `migrate-up` | `go run -tags postgres github.com/golang-migrate/migrate/v4/cmd/migrate -path migrations -database $(DATABASE_URL) up` | **fixed.** Applies every pending migration. |
+| `migrate-down` | `go run -tags postgres github.com/golang-migrate/migrate/v4/cmd/migrate -path migrations -database $(DATABASE_URL) down 1` | **fixed.** Reverts the last migration. |
+
+`go tool migrate` cannot apply migrations: golang-migrate builds its
+database drivers behind build tags and `go tool` accepts no build flags, so
+`migrate-up` and `migrate-down` go through `go run -tags postgres`.
+`DATABASE_URL` is exported only to the full-tier targets, never to
+`test-short`.
 
 ## 13. Testing strategy
 
@@ -261,11 +291,25 @@ Planned migrations:
 
 ### 13.3 Mandatory cases
 
-<!-- Behaviours that must have a test, especially every invariant of §5. -->
+<!-- REQUIRED. Behaviours that must have a test: one bullet per case, each
+     named so an acceptance criterion can cite it, and at least one case per
+     invariant of §5. -->
 
-## 14. Decision log
+## 14. Change log
 
-<!-- Deliberate choices, so that nobody "fixes" them later. -->
+### 14.1 Revisions
+
+<!-- One dated entry per change to this document: what changed, why, and
+     which already-built behaviour it invalidates. -->
+
+| Date | Change | Why | Invalidates |
+|---|---|---|---|
+| | | | |
+
+### 14.2 Decisions
+
+<!-- Deliberate choices, so that nobody "fixes" them later. A rejected
+     alternative goes here too, with the reason it was rejected. -->
 
 | Decision | Choice | Main reason |
 |---|---|---|
