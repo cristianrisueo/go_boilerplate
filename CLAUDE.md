@@ -15,9 +15,15 @@ Claude Code.
 Below, "specs" means `docs/project-specs.md` and "plan" means
 `docs/sprints-plan.md`, cited by section number.
 
-The specs and the plan are immutable: never edit them. Read the parts you
-need when you need them. If the code and the specs disagree, stop and report
-it; do not silently follow either.
+The specs and the plan are immutable while a sprint is in flight: no role
+edits either document from the moment a sprint starts until it is approved.
+Between sprints they change in exactly two ways — the specs through
+`/design-project`, the plan through `/scaffold-project`, which regenerates it
+from the approved specs. Nothing else writes to either file, ever: not a
+sprint, not an audit, not a fix round, not by hand in a role session.
+
+Read the parts you need when you need them. If the code and the specs
+disagree, stop and report it; do not silently follow either.
 
 ## Roles
 
