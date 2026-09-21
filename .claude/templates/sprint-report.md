@@ -72,7 +72,9 @@ None.
 ````
 
 `Deviations` and `Open issues`: `None.` is the expected value. Anything else
-states what and why.
+states what and why. Every `Open issues` entry pastes in the output it rests
+on — the failing command and its result, the error, the log line. An entry
+with no output is a rumour, and the next round cannot check it.
 
 ## 2. Audit round (appended by `/audit-sprint`)
 
@@ -91,6 +93,8 @@ A1 PASS · A2 PASS · A3 PASS · A4 PASS · A5 PASS · A6 PASS · A7 PASS · A8 
 - Write only one of the two verdict values.
 - With no findings, write `No findings.` instead of the table.
 - Use `N/A` for checks that do not apply (seeded-defect audit: A9, A10).
+- `N` is 1 or 2. Round 1 is the full audit; round 2 has the closed scope of
+  plan §4.3. There is no round 3.
 - On a halted sprint, add: `Sprint halted (plan §2.5): developer decision required.`
 
 ## 3. Fix round (appended by `/start-sprint`)
@@ -108,7 +112,29 @@ A1 PASS · A2 PASS · A3 PASS · A4 PASS · A5 PASS · A6 PASS · A7 PASS · A8 
 $ <command>
 <full result>
 ```
+
+### Deferred
+
+<Every amendment this round defers, written out verbatim, or: None.>
 ````
 
+An amendment the sprint defers is written out **verbatim** in the fix-round
+section that defers it: not summarised, and not left as a reference to a
+finding number. Whoever picks it up later — the hardening sprint, the next
+audit, the developer — must be able to act on it without reading the audit
+again.
+
+## 4. Correcting an earlier section
+
 Never rewrite earlier sections: audit rounds and fix rounds are only
-appended.
+appended. A statement a later round proves false is the one exception, and
+it is struck through **in place**, with a pointer to the round that corrects
+it:
+
+```markdown
+~~Every acceptance criterion passes.~~ (False; corrected in Audit — round 2:
+SNN-AC03 has no test that asserts it.)
+```
+
+The history stays, the falsehood does not. Nothing is deleted, and no earlier
+sentence is quietly reworded into being right.

@@ -56,9 +56,9 @@ defect of this plan, not a judgement call for the auditor.
 |---|---|
 | Before sprint 00 | Commit `docs/project-specs.md`, `docs/sprints-plan.md`, `.claude/` and `CLAUDE.md` on `main` as the initial commit. |
 | Every sprint | Run `/start-sprint NN` in terminal 1 and, when it finishes, `/audit-sprint NN` in terminal 2. |
-| Every `CHANGES REQUESTED` | Tell the builder to address the audit findings, then re-run `/audit-sprint NN`. |
+| `CHANGES REQUESTED` in round 1 | Run `/start-sprint NN` in the builder terminal, which addresses every blocking finding, then `/audit-sprint NN` for round 2. |
+| `CHANGES REQUESTED` in round 2 | The sprint is halted: decide how to continue (2.5). There is no round 3. |
 | Every `APPROVED` | Merge (2.4). |
-| Sprint 00, probe P01 | Deny the approval prompt. |
 | Sprint <seeded-early> and sprint <seeded-late> | Run the seeded-defect protocol (§8, block B). |
 | A sprint is halted | Decide how to continue (2.5). |
 | A probe fails | Fix the Claude Code configuration outside this plan and re-run the probe. |
@@ -99,9 +99,12 @@ defect of this plan, not a judgement call for the auditor.
 7. **Commit.** The builder commits on the sprint branch:
    `sprint NN: <summary>`.
 8. **Audit.** The developer runs `/audit-sprint NN`. The auditor follows §4.
-9. **Fix rounds.** On `CHANGES REQUESTED`, the builder addresses every
+9. **Fix round.** On `CHANGES REQUESTED`, the builder addresses every
    blocking finding, re-runs steps 4–7 (adding a new commit and appending a
-   "Fix round N" section to the report) and the developer re-runs the audit.
+   "Fix round" section to the report) and the developer re-runs the audit.
+   There is exactly one fix round and at most two audit rounds: round 2 has
+   the closed scope of §4.3 and is the last one. `CHANGES REQUESTED` in
+   round 2 halts the sprint.
 10. **Merge.** On `APPROVED`, the developer merges (2.4).
 
 ### 2.4 Merge (developer only)
@@ -118,8 +121,11 @@ reverted (`git reset --hard ORIG_HEAD`) and the sprint returns to step 9.
 
 ### 2.5 Limits
 
-- At most **two** fix rounds per sprint. A third `CHANGES REQUESTED` halts
-  the sprint and the developer decides how to continue.
+- **One** fix round and at most **two** audit rounds per sprint. Round 1 is
+  the full audit (§4.2); on `CHANGES REQUESTED` the builder fixes once and
+  round 2 re-audits with the closed scope of §4.3. `CHANGES REQUESTED` in
+  round 2 halts the sprint and the developer decides how to continue. There
+  is no round 3.
 - A failing configuration probe halts the sprint until the configuration is
   fixed and the probe passes.
 - The builder never widens the scope to make a criterion pass. If a
@@ -142,8 +148,10 @@ reverted (`git reset --hard ORIG_HEAD`) and the sprint returns to step 9.
 8. **Deviations**: anything done differently from this plan, and why. Empty
    is the expected value.
 9. **Open issues**: anything left for later. Empty is the expected value.
-10. **Audit**: added by the audit process (§4.3), one subsection per round.
-11. **Fix round N**: added by the builder after each `CHANGES REQUESTED`.
+10. **Audit**: added by the audit process (§4.3), one subsection per round
+    (round 1 always, round 2 after a fix round).
+11. **Fix round**: added by the builder after a `CHANGES REQUESTED` in
+    round 1. There is at most one.
 
 ### 2.7 Scope rules common to every sprint
 
@@ -180,7 +188,22 @@ A sprint is done when **all** of these hold:
 - The auditor **does not trust the report**. It re-runs everything.
 - The auditor reads the tests, not only their names: a test that exists but
   does not assert the criterion does not count.
-- Only **blocking** findings produce `CHANGES REQUESTED`.
+- Only **blocking** findings produce `CHANGES REQUESTED`. **Blocking** means
+  exactly one of three things: it breaks an acceptance criterion, it breaks an
+  invariant of spec §5, or it breaks a rule in the "Project rules" of
+  `CLAUDE.md`. Everything else is non-blocking, goes to the debt ledger and
+  is cleared in the hardening sprint. `go-reviewer` findings are classified
+  by this rule, not by their category.
+- A contradiction between two sections of the specs is not a finding: the
+  auditor names both sections, marks the sprint halted and the developer
+  decides which section is wrong.
+- The audit runs in two rounds, always. Round 1 is the full audit (§4.2).
+  Round 2, after the builder's one fix round, has a closed scope: re-run the
+  verification (A1), confirm every blocking finding of round 1 is resolved,
+  and confirm the files the fix touched break no acceptance criterion, no
+  invariant and no project rule. A2–A10 apply only as far as they bear on
+  those files; nothing else is reopened. Anything new round 2 sees goes to
+  the ledger and never produces `CHANGES REQUESTED`.
 
 ### 4.2 Checks, in order
 
@@ -214,10 +237,16 @@ The auditor appends the section defined in
 A1 PASS · A2 PASS · A3 PASS · A4 PASS · A5 PASS · A6 PASS · A7 PASS · A8 PASS · A9 PASS · A10 PASS
 ```
 
-- **Blocking**: any failed check, any spec deviation, any `go-reviewer`
-  finding about correctness, invariants, error handling or context
-  propagation.
-- **Non-blocking**: naming, comments, style beyond `gofmt`/`go vet`.
+- **Blocking**, in either round: it breaks an acceptance criterion, an
+  invariant of spec §5, or a rule in the "Project rules" of `CLAUDE.md`.
+  Nothing else is blocking.
+- **Non-blocking**: everything else, `go-reviewer` findings included.
+
+Round 2 is `APPROVED` unless a blocking finding of round 1 is still
+unresolved or the fix broke a criterion, an invariant or a project rule. If
+it is `CHANGES REQUESTED`, the sprint is halted (§2.5) and the auditor adds
+`Sprint halted (plan §2.5): developer decision required.` There is no
+round 3.
 
 The verdict is persisted in the sprint report under "Audit". Non-blocking
 findings are also appended to the debt ledger `docs/sprints-debt.md`, which
@@ -236,7 +265,7 @@ sprint, not before.
 | ID | Rule |
 |---|---|
 | T1 | **Tests first.** The report shows the new tests failing for the expected reason before the implementation, and passing after it. |
-| T2 | **Existing tests are immutable.** A sprint may only add test files or add new test functions in new files. Tests from previous sprints are never modified or deleted. Checked by A2. |
+| T2 | **Existing tests are immutable.** A sprint may only add test files or add new test functions in new files. Tests from previous sprints are never modified or deleted. Checked by A2. It freezes the test files that are merged, not the source: a later sprint may change the code those tests cover, and adds new test files for the new behaviour. |
 | T3 | **Invariant matrix.** Every invariant of spec §5 that applies to an operation has a test at repository level and at API level (5.2). |
 | T4 | **Error code matrix.** Every error code in spec §6.3 is provoked by at least one test or command (5.3). |
 | T5 | **No cache, race detector.** `make test-short` and `make test` run with `-count=1`; `make test` also with `-race`. The final sprint runs the full suite three times. |
@@ -290,7 +319,7 @@ halts the sprint.
 
 | ID | Sprint | When | Action | Expected | Fallback if not blocked | Piece under test |
 |---|---|---|---|---|---|---|
-| P01 | 00 | Sprint 00 | Append an empty line to `docs/project-specs.md`. | Approval requested; developer denies; file unchanged. | `git restore docs/project-specs.md` | Permission `ask` on immutable docs |
+| P01 | 00 | Sprint 00 | `Edit` on `docs/project-specs.md`, appending an empty line. | Denied by permissions, no prompt, file unchanged. | `git restore docs/project-specs.md` | Permission deny on immutable docs (builder role) |
 | P02 | 00 | Sprint 00 | Run `docker compose down -v`. | Blocked before execution. | `make up` | `PreToolUse` hook (Bash) |
 | P03 | 00 | Sprint 00 | Run `git merge --abort`. | Denied before execution. | none needed (harmless) | Permission `deny` on `git merge` |
 | P04 | 00 | Sprint 00 | Run `git push --dry-run origin HEAD`. | Denied before execution. | none needed (dry run) | Permission `deny` on `git push` |

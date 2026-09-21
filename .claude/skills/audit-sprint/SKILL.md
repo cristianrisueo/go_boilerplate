@@ -19,6 +19,9 @@ or tests and never fix anything: you find, classify and report.
   (seeded-defect audit). Anything else means the builder may still be
   working: stop and say so.
 - Round `N` = number of `## Audit — round` sections in the report, plus 1.
+  `N` is 1 or 2. If the report already has a `## Audit — round 2` section,
+  stop: there is no round 3 (plan §2.5). Round 1 is the full audit (§1, §2);
+  round 2 has the closed scope of §2b.
 
 **Seeded-defect mode.** If the report says "Seeded-defect audit", there is
 no builder report to check. In this mode, A1 uses the standard command
@@ -29,7 +32,7 @@ below, A9 and A10 are `N/A`, and A8 is judged against the spec only.
 The sprint section of the plan; plan §2.7, §3, §4 and §5; the spec sections
 the sprint touches; the report; and the full diff: `git diff main...HEAD`.
 
-## 2. Checks, in order (plan §4.2)
+## 2. Round 1 — the full audit: checks, in order (plan §4.2)
 
 | # | What to do |
 |---|---|
@@ -44,16 +47,47 @@ the sprint touches; the report; and the full diff: `git diff main...HEAD`.
 | A9 | Every probe of the sprint is in the report and marked `PASS`. |
 | A10 | The report has every section of plan §2.6. |
 
+## 2b. Round 2 — the closed scope (plan §4.3)
+
+Round 2 comes after the builder's one fix round. It examines three things:
+
+1. **A1.** Re-run the sprint's verification section step by step, plus
+   `make check`, `make test-short` and `make test`.
+2. Every **blocking** finding of round 1 is resolved.
+3. The files the fix touched break no acceptance criterion, no invariant of
+   spec §5 and no rule in the "Project rules" of `CLAUDE.md`. Get them from
+   the diff of the fix-round commits.
+
+A2–A10 apply only as far as they bear on those files. Nothing else is
+examined: the rest of the sprint was audited in round 1 and is not reopened.
+
+Anything new that round 2 sees goes to the debt ledger (§4b). It never
+produces `CHANGES REQUESTED`.
+
+Round 2 is `APPROVED` unless a round-1 blocking finding is still unresolved
+or the fix broke a criterion, an invariant or a project rule. If it is
+`CHANGES REQUESTED`, the sprint is halted: add the line the template gives
+for that case, and the developer decides. There is no round 3.
+
 ## 3. Classify (plan §4.3)
 
-- **blocking**: any failed check, any spec deviation, any `go-reviewer`
-  finding about correctness, invariants, error handling or context
-  propagation.
-- **non-blocking**: naming, comments, style beyond `gofmt` and `go vet`.
+**Blocking**, in either round, means exactly one of three things:
+
+- it breaks an acceptance criterion of the sprint;
+- it breaks an invariant of spec §5;
+- it breaks a rule in the "Project rules" of `CLAUDE.md`.
+
+Everything else is **non-blocking** and goes to the ledger (§4b), however
+serious it sounds. `go-reviewer` findings are classified by this rule, not by
+the category the subagent gives them: a correctness finding that breaks none
+of the three is non-blocking.
 
 The verdict is `CHANGES REQUESTED` only if there is at least one blocking
-finding. If this is round 3 and the verdict is `CHANGES REQUESTED`, the sprint is
-halted: add the line the template gives for that case.
+finding.
+
+A contradiction between two sections of the specs is **not** a finding: you
+cannot tell which section is wrong. Name both sections, mark the sprint
+halted with the line the template gives, and stop. The developer decides.
 
 ## 4. Persist
 
@@ -70,6 +104,10 @@ finding, status `Open`. Skip a finding when the audit itself justifies the
 current behaviour, or when it belongs to another list (a weak metric, a plan
 defect, a naming choice the plan prescribes). Skip this step entirely if no
 finding qualifies.
+
+In round 2 this is where everything new lands: every finding that was not a
+blocking finding of round 1 is recorded here, whatever a full audit would
+have called it.
 
 ## 5. Commit the report and the ledger
 

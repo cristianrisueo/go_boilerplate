@@ -115,8 +115,8 @@ Never merge or push.
 ## Fix round
 
 1. Read the last `## Audit — round N` section of the report.
-2. If the report already has two `## Fix round` sections, stop: the sprint
-   is halted (plan §2.5) and the developer decides.
+2. If the report already has a `## Fix round` section, stop: the sprint has
+   had its one fix round (plan §2.5) and the developer decides.
 3. Address **every blocking finding**. Fix non-blocking findings only if the
    change is trivial and inside the scope. Existing tests stay untouched
    (T2).

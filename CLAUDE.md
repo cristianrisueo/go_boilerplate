@@ -30,9 +30,11 @@ Sessions start through a launcher that sets `CLAUDE_ROLE`:
 | auditor     | `.claude/bin/audit.sh`     | `/audit-sprint NN` |
 | developer   | plain `claude`             | maintenance        |
 
-Never merge, push, or commit on `main`. Never edit `.claude/`: the designer
-is the only role that writes `CLAUDE.md` and `.claude/rules/`, and never the
-permissions, hooks, launchers, skills or templates.
+Never merge, push, or commit on `main`. In a role session, never edit
+`.claude/`: the architect is the only role that writes `CLAUDE.md` and
+`.claude/rules/`, and no role writes the permissions, hooks, launchers,
+skills or templates. Those are the enforced layer, and the plain developer
+session is the one that changes the configuration.
 
 ## Commands
 
@@ -96,7 +98,7 @@ Never run `make reset` or `docker compose down -v`: they wipe the database.
 
 ## Project rules
 
-<!-- DESIGNER: write this section after the specs and the plan are approved,
+<!-- ARCHITECT: write this section after the specs and the plan are approved,
      never before. One rule per invariant of specs §5, stated so that
      go-reviewer and the auditor can check it by reading a diff. Add the
      import rules of specs §8.2 and how database tests get their pool and
