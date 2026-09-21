@@ -7,6 +7,7 @@
       "Bash(go vet *)",
       "Bash(go mod *)",
       "Bash(go get *)",
+      "Bash(go run *)",
       "Bash(go list *)",
       "Bash(go tool *)",
       "Bash(go version)",

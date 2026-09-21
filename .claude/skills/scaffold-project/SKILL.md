@@ -26,6 +26,9 @@ You work without pauses. Report at the end, not in between.
 - The working tree may be dirty **only** in `docs/project-specs.md`: the
   specs may have just been pasted in or revised. Anything else uncommitted,
   stop and say what it is.
+- On a repository with no commits yet everything is untracked. That is the
+  first run: proceed. The dirty-tree rule above applies once there is at
+  least one commit.
 
 ## 1. Intake check
 
@@ -128,6 +131,7 @@ mechanical. Where a gap needs a decision, leave it and report it.
 | Every error code of specs §6.3 has a row in plan §5.3            | Report: it needs a test that provokes it          |
 | Every probe of plan §6 has a sprint                              | Fix                                               |
 | Every acceptance criterion names a test or a command             | Fix, or report if the criterion is not verifiable |
+| No acceptance criterion and no verification step needs a command `hooks/guard.sh` or the builder's permissions block (`make reset`, `docker compose down -v`, `git push`, `git merge`) | Fix: reword the criterion to something the builder can run |
 | Every test the plan's §5.3 names is named by some acceptance criterion | Fix                                          |
 | Every file of the specs §9 tree is created by some sprint        | Report                                            |
 | No sprint depends on something no earlier sprint builds          | Report: the order is wrong                        |

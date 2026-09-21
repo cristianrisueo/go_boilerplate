@@ -21,6 +21,10 @@ to them.
 | `docs/reports/sprint-NN.md` | What each sprint delivered and how it was audited.                               | `/start-sprint` and `/audit-sprint`                              | `.claude/templates/sprint-report.md` |
 | `docs/sprints-debt.md`      | What each audit leaves behind as non-blocking debt.                              | `/scaffold-project`, then `/audit-sprint`                        | `.claude/templates/sprints-debt.md`  |
 
+A new project starts with the repository: create it with `git init -b main`.
+The guard's on-main checks and the auditor's `git diff main...HEAD` assume
+that branch name.
+
 The specs are the only document written by hand. There are two routes to
 them, and they end in the same place:
 

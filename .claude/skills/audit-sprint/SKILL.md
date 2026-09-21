@@ -42,7 +42,7 @@ the sprint touches; the report; and the full diff: `git diff main...HEAD`.
 | A4 | Check the rules of plan §5 (T1–T14) that apply to this sprint. From the plan's coverage sprint (plan §2.6), run the coverage command; below 80 %, list the uncovered functions (blocking only if a criterion needs them, T6). |
 | A5 | Status codes, error codes, envelope, validation and ordering in the diff match the spec. |
 | A6 | Every invariant of spec §5 holds in the diff (see also the "Project rules" of `CLAUDE.md`). |
-| A7 | Use the `go-reviewer` subagent on `git diff main...HEAD`. Include its findings. |
+| A7 | Use the `go-reviewer` subagent on `git diff main...HEAD`. Include its findings. Wait for its report: the verdict is never written while the subagent is still running. |
 | A8 | No file and no behaviour outside the sprint scope (plan §2.7). New test file names beyond spec §9 are expected. |
 | A9 | Every probe of the sprint is in the report and marked `PASS`. |
 | A10 | The report has every section of plan §2.6. |
@@ -104,6 +104,9 @@ finding, status `Open`. Skip a finding when the audit itself justifies the
 current behaviour, or when it belongs to another list (a weak metric, a plan
 defect, a naming choice the plan prescribes). Skip this step entirely if no
 finding qualifies.
+
+If the finding is the same defect as an `Open` row already in the ledger, add
+the new location to that row instead of opening a second one.
 
 In round 2 this is where everything new lands: every finding that was not a
 blocking finding of round 1 is recorded here, whatever a full audit would
